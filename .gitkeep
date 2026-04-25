@@ -1,0 +1,15 @@
+New-Item src\.gitkeep
+New-Item src\validators\.gitkeep
+New-Item src\processors\.gitkeep
+New-Item src\readers\.gitkeep
+New-Item src\writers\.gitkeep
+New-Item src\utils\.gitkeep
+
+New-Item data\.gitkeep
+New-Item data\input\.gitkeep
+New-Item data\output\.gitkeep
+New-Item data\error\.gitkeep
+New-Item data\archive\.gitkeep
+
+New-Item dags\.gitkeep
+New-Item tests\.gitkeep

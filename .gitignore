@@ -1,0 +1,36 @@
+# Ignore all data files
+data/input/*
+data/output/*
+data/error/*
+data/archive/*
+
+# Ignore parquet files everywhere
+*.parquet
+
+# Keep folder structure (allow empty folders)
+!data/input/.gitkeep
+!data/output/.gitkeep
+!data/error/.gitkeep
+!data/archive/.gitkeep
+
+# Python stuff
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment / secrets
+.env
+
+data/input/*
+data/output/*
+data/error/*
+data/archive/*
+*.parquet
+
+__pycache__/
+*.pyc
+
+.env
+.ipynb_checkpoints/
