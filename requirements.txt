@@ -1,0 +1,7 @@
+pandas
+pyarrow
+openpyxl
+azure-storage-blob
+apache-airflow
+python-dotenv
+watchdog
