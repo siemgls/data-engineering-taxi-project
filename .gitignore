@@ -4,36 +4,21 @@ data/output/*
 data/error/*
 data/archive/*
 
-# Ignore parquet files everywhere
-*.parquet
-
-# Keep folder structure (allow empty folders)
+# Keep folder structure
 !data/input/.gitkeep
 !data/output/.gitkeep
 !data/error/.gitkeep
 !data/archive/.gitkeep
 
-# Python stuff
+# Ignore parquet files
+*.parquet
+
+# Python cache
 __pycache__/
 *.pyc
 
 # Jupyter
 .ipynb_checkpoints/
 
-# Environment / secrets
+# Environment variables
 .env
-
-data/input/*
-data/output/*
-data/error/*
-data/archive/*
-*.parquet
-
-__pycache__/
-*.pyc
-
-.env
-.ipynb_checkpoints/
-
-__pycache__/
-*.pyc
