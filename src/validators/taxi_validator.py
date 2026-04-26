@@ -5,8 +5,8 @@ class TaxiValidator:
 
     def validate(self, df: pd.DataFrame):
         errors = []
+        bad_rows = pd.DataFrame()
 
-        # 1. Required columns
         required_columns = [
             "tpep_pickup_datetime",
             "tpep_dropoff_datetime",
@@ -19,41 +19,64 @@ class TaxiValidator:
             "total_amount"
         ]
 
+        # Check required columns
         for col in required_columns:
             if col not in df.columns:
                 errors.append(f"Missing column: {col}")
 
-        # 2. Null check (only required columns)
-        for col in required_columns:
-            null_count = df[col].isna().sum()
-            if null_count > 0:
-                errors.append(f"{col} has {null_count} null values")
+        # Stop if required columns are missing
+        if errors:
+            print("VALIDATION ERRORS:")
+            for error in errors:
+                print("-", error)
 
-        # 3. Date logic
+            return df, errors, bad_rows
+
+        # Null checks
+        for col in required_columns:
+            null_rows = df[df[col].isna()]
+            if len(null_rows) > 0:
+                errors.append(f"{col} has {len(null_rows)} null values")
+                bad_rows = pd.concat([bad_rows, null_rows])
+
+        # Date logic
         bad_dates = df[df["tpep_dropoff_datetime"] < df["tpep_pickup_datetime"]]
         if len(bad_dates) > 0:
             errors.append(f"{len(bad_dates)} rows have dropoff before pickup")
+            bad_rows = pd.concat([bad_rows, bad_dates])
 
-        # 4. Negative values
-        numeric_checks = ["trip_distance", "fare_amount", "total_amount"]
+        # Negative trip distance
+        negative_distance = df[df["trip_distance"] < 0]
+        if len(negative_distance) > 0:
+            errors.append(f"trip_distance has {len(negative_distance)} negative values")
+            bad_rows = pd.concat([bad_rows, negative_distance])
 
-        for col in numeric_checks:
-            negative_count = (df[col] < 0).sum()
-            if negative_count > 0:
-                errors.append(f"{col} has {negative_count} negative values")
+        # Negative fare amount
+        negative_fare = df[df["fare_amount"] < 0]
+        if len(negative_fare) > 0:
+            errors.append(f"fare_amount has {len(negative_fare)} negative values")
+            bad_rows = pd.concat([bad_rows, negative_fare])
 
-        # 5. Passenger count check
-        invalid_passengers = (df["passenger_count"] < 0).sum()
-        if invalid_passengers > 0:
-            errors.append(f"{invalid_passengers} invalid passenger counts")
+        # Negative total amount
+        negative_total = df[df["total_amount"] < 0]
+        if len(negative_total) > 0:
+            errors.append(f"total_amount has {len(negative_total)} negative values")
+            bad_rows = pd.concat([bad_rows, negative_total])
 
-        # Result
+        # Invalid passenger count
+        invalid_passenger_count = df[df["passenger_count"] < 0]
+        if len(invalid_passenger_count) > 0:
+            errors.append(f"passenger_count has {len(invalid_passenger_count)} invalid values")
+            bad_rows = pd.concat([bad_rows, invalid_passenger_count])
+
+        # Print result
         if errors:
             print("VALIDATION ERRORS:")
-            for e in errors:
-                print("-", e)
-
+            for error in errors:
+                print("-", error)
         else:
-            print("Validation passed!")
+            print("Raw validation passed!")
 
-        return df
+        bad_rows = bad_rows.drop_duplicates()
+
+        return df, errors, bad_rows

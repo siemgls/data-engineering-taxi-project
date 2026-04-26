@@ -1,39 +1,47 @@
 import pandas as pd
 import numpy as np
 
+
 class TaxiProcessor:
 
     def process(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
 
         # Remove required columns
-        columns_to_remove = ["VendorID", "store_and_fwd_flag", "RatecodeID"]
-        df = df.drop(columns=[col for col in columns_to_remove if col in df.columns])
+        columns_to_remove = [
+            "VendorID",
+            "store_and_fwd_flag",
+            "RatecodeID"
+        ]
+
+        df = df.drop(
+            columns=[col for col in columns_to_remove if col in df.columns]
+        )
 
         # Trip duration in minutes
         df["trip_duration_minutes"] = (
             df["tpep_dropoff_datetime"] - df["tpep_pickup_datetime"]
         ).dt.total_seconds() / 60
 
-        # Average speed, only if duration > 0
+        # Average speed in mph
         df["average_speed_mph"] = np.where(
             df["trip_duration_minutes"] > 0,
             df["trip_distance"] / (df["trip_duration_minutes"] / 60),
             np.nan
         )
 
-        # Pickup year/month
+        # Pickup year and month
         df["pickup_year"] = df["tpep_pickup_datetime"].dt.year
         df["pickup_month"] = df["tpep_pickup_datetime"].dt.month
 
-        # Revenue per mile, only if distance > 0
+        # Revenue per mile
         df["revenue_per_mile"] = np.where(
             df["trip_distance"] > 0,
             df["total_amount"] / df["trip_distance"],
             np.nan
         )
 
-        # Distance category
+        # Trip distance category
         df["trip_distance_category"] = pd.cut(
             df["trip_distance"],
             bins=[-float("inf"), 2, 10, float("inf")],
@@ -49,7 +57,7 @@ class TaxiProcessor:
             right=False
         )
 
-        # Time of day
+        # Trip time of day
         hour = df["tpep_pickup_datetime"].dt.hour
 
         df["trip_time_of_day"] = pd.cut(
