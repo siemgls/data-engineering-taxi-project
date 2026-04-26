@@ -5,10 +5,12 @@ import pandas as pd
 # Make src importable
 sys.path.insert(0, os.path.abspath("."))
 
+from dotenv import load_dotenv
 from src.validators.taxi_validator import TaxiValidator
 from src.processors.taxi_processor import TaxiProcessor
 from src.validators.backup_validator import BackupValidator
 from src.writers.local_writer import LocalWriter
+from src.writers.azure_blob_writer import AzureBlobWriter
 from src.utils.logger import ErrorLogger
 
 
@@ -18,6 +20,11 @@ OUTPUT_PATH = "data/output/processed_taxi_2026_01.parquet"
 
 def main():
     print("=== START TAXI PIPELINE ===")
+
+    # Load environment variables
+    load_dotenv()
+    connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+    container_name = os.getenv("AZURE_CONTAINER_NAME")
 
     # 1. Read
     print("Reading data...")
@@ -47,10 +54,19 @@ def main():
     logger.log_messages(backup_errors, "backup_validation_errors")
     logger.log_rows(backup_bad_rows, "backup_bad_rows")
 
-    # 7. Write output
-    print("Writing output...")
+    # 7. Write output locally
+    print("Writing output locally...")
     writer = LocalWriter()
     writer.write_parquet(processed_df, OUTPUT_PATH)
+
+    # 8. Upload to Azure
+    print("Uploading to Azure Blob Storage...")
+    azure_writer = AzureBlobWriter(connection_string, container_name)
+
+    azure_writer.upload_file(
+        OUTPUT_PATH,
+        "processed/processed_taxi_2026_01.parquet"
+    )
 
     print("=== PIPELINE FINISHED ===")
 
