@@ -68,6 +68,35 @@ def process_file(file_path: str):
     print(f"Archived input file to {archived_path}")
 
 
+def process_once():
+    print("Checking realtime input folder once...")
+
+    os.makedirs(WATCH_FOLDER, exist_ok=True)
+    os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+    os.makedirs(ARCHIVE_FOLDER, exist_ok=True)
+
+    files = os.listdir(WATCH_FOLDER)
+
+    processed_count = 0
+
+    for file in files:
+        file_path = os.path.join(WATCH_FOLDER, file)
+
+        if not os.path.isfile(file_path):
+            continue
+
+        if not file.endswith((".csv", ".xlsx")):
+            continue
+
+        try:
+            process_file(file_path)
+            processed_count += 1
+        except Exception as e:
+            print(f"Error processing {file}: {e}")
+
+    print(f"Realtime one-time check finished. Files processed: {processed_count}")
+
+
 def watch_folder():
     print("Watching folder for new files...")
 
@@ -102,4 +131,4 @@ def watch_folder():
 
 
 if __name__ == "__main__":
-    watch_folder()
+    process_once()

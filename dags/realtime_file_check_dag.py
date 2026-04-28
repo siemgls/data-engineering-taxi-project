@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from airflow import DAG
-from airflow.operators.bash import BashOperator
-
+from airflow.providers.standard.operators.bash import BashOperator
 
 PROJECT_PATH = "/opt/airflow/project"
 
@@ -14,9 +13,9 @@ default_args = {
 with DAG(
     dag_id="realtime_file_check_pipeline",
     default_args=default_args,
-    description="Checks realtime input folder and processes new files",
+    description="Checks realtime input folder and processes files",
     start_date=datetime(2026, 4, 27),
-    schedule_interval="*/1 * * * *",
+    schedule="*/1 * * * *",
     catchup=False,
 ) as dag:
 
@@ -24,5 +23,3 @@ with DAG(
         task_id="check_realtime_folder",
         bash_command=f"cd {PROJECT_PATH} && python src/realtime/realtime_pipeline.py",
     )
-
-    check_realtime_folder

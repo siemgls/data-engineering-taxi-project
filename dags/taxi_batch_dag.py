@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from airflow import DAG
-from airflow.operators.bash import BashOperator
-
+from airflow.providers.standard.operators.bash import BashOperator
 
 PROJECT_PATH = "/opt/airflow/project"
 
@@ -16,7 +15,7 @@ with DAG(
     default_args=default_args,
     description="Batch pipeline for NYC taxi data",
     start_date=datetime(2026, 4, 27),
-    schedule_interval=None,
+    schedule=None,
     catchup=False,
 ) as dag:
 
@@ -24,5 +23,3 @@ with DAG(
         task_id="run_taxi_pipeline",
         bash_command=f"cd {PROJECT_PATH} && python run_taxi_pipeline.py",
     )
-
-    run_taxi_pipeline
