@@ -15,7 +15,7 @@ with DAG(
     default_args=default_args,
     description="Batch pipeline for NYC taxi data",
     start_date=datetime(2026, 4, 27),
-    schedule=None,
+    schedule="@daily",
     catchup=False,
 ) as dag:
 
